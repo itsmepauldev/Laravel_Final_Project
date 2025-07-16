@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 use App\Models\Payment;
 use App\Models\Applicant;
@@ -23,6 +23,14 @@ class PaymentController extends Controller
         ]);
 
         Payment::create($request->all());
+        $applicant = Applicant::find($request->applicant_id);
+
+        ActivityLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'create',
+            'description' => 'Added payment for: ' . $applicant->name . ' (ID: ' . $applicant->id . ')'
+        ]);
+
 
         return redirect('/applicant-management')->with('success', 'Payment added successfully.');
     }
@@ -44,13 +52,32 @@ class PaymentController extends Controller
 
         $payment = Payment::findOrFail($id);
         $payment->update($request->all());
+        $applicant = Applicant::find($payment->applicant_id);
+
+        ActivityLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'update',
+            'description' => 'Updated payment for: ' . $applicant->name . ' (ID: ' . $applicant->id . ')'
+        ]);
+
 
         return redirect('/applicant-management')->with('success', 'Payment updated successfully.');
     }
 
     public function destroy($id)
     {
-        Payment::destroy($id);
-        return back()->with('success', 'Payment deleted successfully.');
+        $payment = Payment::findOrFail($id);
+        $applicant = $payment->applicant;
+        $payment->delete();
+
+        ActivityLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'delete',
+            'description' => 'Deleted payment for: ' . $applicant->name . ' (ID: ' . $applicant->id . ')'
+        ]);
+
+
+        return redirect()->back()->with('success', 'Payment deleted successfully.');
     }
+
 }

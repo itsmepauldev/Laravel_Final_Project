@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 use App\Models\Reference;
 use App\Models\Applicant;
@@ -24,6 +24,14 @@ class ReferenceController extends Controller
         ]);
 
         Reference::create($request->all());
+        $applicant = Applicant::find($request->applicant_id);
+
+        ActivityLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'create',
+            'description' => 'Added reference for: ' . $applicant->name . ' (ID: ' . $applicant->id . ')'
+        ]);
+
         return redirect('/applicant-management')->with('success', 'Reference added successfully.');
     }
 
@@ -45,13 +53,32 @@ class ReferenceController extends Controller
 
         $reference = Reference::findOrFail($id);
         $reference->update($request->all());
+        $applicant = Applicant::find($reference->applicant_id);
+
+        ActivityLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'update',
+            'description' => 'Updated reference for: ' . $applicant->name . ' (ID: ' . $applicant->id . ')'
+        ]);
+
 
         return redirect('/applicant-management')->with('success', 'Reference updated successfully.');
     }
 
     public function destroy($id)
     {
-        Reference::destroy($id);
-        return back()->with('success', 'Reference deleted successfully.');
+        $reference = Reference::findOrFail($id);
+        $applicant = $reference->applicant;
+        $reference->delete();
+
+        ActivityLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'delete',
+            'description' => 'Deleted reference for: ' . $applicant->name . ' (ID: ' . $applicant->id . ')'
+        ]);
+
+
+
+        return redirect()->back()->with('success', 'Reference deleted successfully.');
     }
 }

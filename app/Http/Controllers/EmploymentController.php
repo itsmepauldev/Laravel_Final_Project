@@ -2,7 +2,7 @@
 
 // app/Http/Controllers/EmploymentController.php
 namespace App\Http\Controllers;
-
+use App\Models\ActivityLog;
 use App\Models\Employment;
 use App\Models\Applicant;
 use Illuminate\Http\Request;
@@ -26,6 +26,14 @@ class EmploymentController extends Controller
         ]);
 
         Employment::create($request->all());
+        $applicant = Applicant::find($request->applicant_id);
+
+        ActivityLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'create',
+            'description' => 'Added employment for: ' . $applicant->name . ' (ID: ' . $applicant->id . ')'
+        ]);
+
         return redirect('/applicant-management')->with('success', 'Employment added!');
     }
 
@@ -48,13 +56,30 @@ class EmploymentController extends Controller
 
         $employment = Employment::findOrFail($id);
         $employment->update($request->all());
+        $applicant = Applicant::find($employment->applicant_id);
+
+        ActivityLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'update',
+            'description' => 'Updated employment for: ' . $applicant->name . ' (ID: ' . $applicant->id . ')'
+        ]);
 
         return redirect('/applicant-management')->with('success', 'Employment updated!');
     }
 
     public function destroy($id)
     {
-        Employment::destroy($id);
+        $employment = Employment::findOrFail($id);
+        $applicant = $employment->applicant;
+        $employment->delete();
+
+        ActivityLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'delete',
+            'description' => 'Deleted employment for: ' . $applicant->name . ' (ID: ' . $applicant->id . ')'
+        ]);
+
+
         return redirect()->back()->with('success', 'Employment deleted!');
     }
 }

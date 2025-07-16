@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
+use App\Models\JobOpening;
 class HomeController extends Controller
 {
     /**
@@ -21,8 +21,12 @@ class HomeController extends Controller
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
+
+
     public function index()
     {
-        return view('home');
+        $activeJobs = JobOpening::where('status', 'active')->get();
+        return view('home', compact('activeJobs'));
     }
+
 }

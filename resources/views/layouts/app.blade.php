@@ -63,37 +63,54 @@
 
 <body>
     <div class="d-flex">
-        <!-- Sidebar -->
-        <div class="sidebar p-3" id="sidebar">
-            <h5 class="text-white mb-4">Admin Panel</h5>
-            <ul class="nav flex-column">
-                <li class="nav-item">
-                    <a href="/home" class="nav-link {{ request()->is('home') ? 'active' : '' }}">
-                        <i class="bi bi-house-door"></i> Dashboard
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="/applicant-management"
-                        class="nav-link {{ request()->is('applicant-management') ? 'active' : '' }}">
-                        <i class="bi bi-person-lines-fill"></i> Applicant Management
-                    </a>
-                </li>
+        <!-- Sidebar (only shown if authenticated) -->
+        @auth
+            <div class="sidebar p-3" id="sidebar">
+                <h5 class="text-white mb-4">Admin Panel</h5>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a href="/home" class="nav-link {{ request()->is('home') ? 'active' : '' }}">
+                            <i class="bi bi-house-door"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/applicant-management"
+                            class="nav-link {{ request()->is('applicant-management') ? 'active' : '' }}">
+                            <i class="bi bi-person-lines-fill"></i> Applicant Management
+                        </a>
+                    </li>
 
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="bi bi-gear"></i> Settings
-                    </a>
-                </li>
-                <li class="nav-item mt-4">
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
-                        <button type="submit" class="btn btn-danger w-100">
-                            <i class="bi bi-box-arrow-right"></i> Logout
-                        </button>
-                    </form>
-                </li>
-            </ul>
-        </div>
+                    <li class="nav-item">
+                        <a href="{{ route('user.index') }}"
+                            class="nav-link {{ request()->is('user-management') ? 'active' : '' }}">
+                            <i class="bi bi-people-fill"></i> User Management
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('job.index') }}"
+                            class="nav-link {{ request()->is('job-opening-management*') ? 'active' : '' }}">
+                            <i class="bi bi-briefcase"></i> Job Opening Management
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="{{ route('activity.index') }}"
+                            class="nav-link {{ request()->is('activity-logs') ? 'active' : '' }}">
+                            <i class="bi bi-clock-history"></i> Activity Logs
+                        </a>
+                    </li>
+
+                    <li class="nav-item mt-4">
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="btn btn-danger w-100">
+                                <i class="bi bi-box-arrow-right"></i> Logout
+                            </button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        @endauth
 
         <!-- Main content -->
         <div class="main-content">
@@ -108,6 +125,7 @@
             document.getElementById('sidebar').classList.toggle('show');
         });
     </script>
+
 </body>
 
 </html>

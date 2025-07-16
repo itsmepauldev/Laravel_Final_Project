@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 use App\Models\Applicant;
 
@@ -28,10 +28,25 @@ class ApplicantController extends Controller
             'address' => 'nullable|string|max:255',
             'gender' => 'nullable|in:Male,Female,Other',
         ]);
+        $applicant = Applicant::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'birthdate' => $request->birthdate,
+            'phone_number' => $request->phone_number,
+            'gender' => $request->gender,
+            'address' => $request->address,
+        ]);
 
-        Applicant::create($request->all());
+        ActivityLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'create',
+            'description' => 'Created applicant: ' . $request->name
+        ]);
+
 
         return redirect('/applicant-management')->with('success', 'Applicant added successfully!');
+
+
     }
 
     public function edit($id)
@@ -53,6 +68,11 @@ class ApplicantController extends Controller
 
         $applicant = Applicant::findOrFail($id);
         $applicant->update($request->all());
+        ActivityLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'update',
+            'description' => 'Updated applicant: ' . $applicant->name . ' (ID: ' . $applicant->id . ')'
+        ]);
 
         return redirect('/applicant-management')->with('success', 'Applicant updated successfully!');
     }
@@ -62,7 +82,14 @@ class ApplicantController extends Controller
         $applicant = Applicant::findOrFail($id);
         $applicant->delete();
 
-        return response()->json(['success' => true]);
+        ActivityLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'delete',
+            'description' => 'Deleted applicant: ' . $applicant->name . ' (ID: ' . $applicant->id . ')'
+        ]);
+
+        return redirect()->back()->with('success', 'Applicant added Successfully!');
+
     }
 
 }

@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 use App\Models\Education;
 use App\Models\Applicant;
@@ -19,6 +19,13 @@ class EducationController extends Controller
         ]);
 
         Education::create($request->all());
+        $applicant = Applicant::find($request->applicant_id);
+
+        ActivityLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'create',
+            'description' => 'Added education for: ' . $applicant->name . ' (ID: ' . $applicant->id . ')'
+        ]);
 
         return redirect('/applicant-management')->with('success', 'Education added successfully!');
 
@@ -42,6 +49,13 @@ class EducationController extends Controller
 
         $education = Education::findOrFail($id);
         $education->update($request->all());
+        $applicant = Applicant::find($education->applicant_id);
+
+        ActivityLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'update',
+            'description' => 'Updated education for: ' . $applicant->name . ' (ID: ' . $applicant->id . ')'
+        ]);
 
         return redirect('/applicant-management')->with('success', 'Education updated successfully!');
 
@@ -50,7 +64,14 @@ class EducationController extends Controller
     public function destroy($id)
     {
         $education = Education::findOrFail($id);
+        $applicant = $education->applicant;
         $education->delete();
+
+        ActivityLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'delete',
+            'description' => 'Deleted education for: ' . $applicant->name . ' (ID: ' . $applicant->id . ')'
+        ]);
 
         return redirect()->back()->with('success', 'Education record deleted!');
     }

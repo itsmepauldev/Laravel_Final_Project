@@ -5,6 +5,9 @@ use App\Http\Controllers\ApplicantController;
 use App\Http\Controllers\EmploymentController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ReferenceController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\ActivityLogController;
+use App\Http\Controllers\JobOpeningController;
 Route::get('/', function () {
     return view('welcome');
 });
@@ -66,3 +69,25 @@ Route::post('/reference/store', [ReferenceController::class, 'store'])->name('re
 Route::get('/reference/{id}/edit', [ReferenceController::class, 'edit'])->name('reference.edit');
 Route::put('/reference/{id}', [ReferenceController::class, 'update'])->name('reference.update');
 Route::delete('/reference/{id}', [ReferenceController::class, 'destroy'])->name('reference.destroy');
+
+Route::get('/user-management', [UserController::class, 'index'])->name('user.index');
+Route::get('/user-management/create', [UserController::class, 'create'])->name('user.create');
+Route::post('/user-management', [UserController::class, 'store'])->name('user.store');
+Route::get('/user-management/{id}/edit', [UserController::class, 'edit'])->name('user.edit');
+Route::put('/user-management/{id}', [UserController::class, 'update'])->name('user.update');
+Route::delete('/user-management/{id}', [UserController::class, 'destroy'])->name('user.destroy');
+
+
+
+Route::get('/activity-logs', [ActivityLogController::class, 'index'])->name('activity.index');
+
+
+
+
+
+Route::get('/job-opening', [JobOpeningController::class, 'index'])->name('job.index');
+Route::get('/job-opening/create', [JobOpeningController::class, 'create'])->name('job.create');
+Route::post('/job-opening', [JobOpeningController::class, 'store'])->name('job.store');
+Route::get('/job-opening/{id}/edit', [JobOpeningController::class, 'edit'])->name('job.edit');
+Route::put('/job-opening/{id}', [JobOpeningController::class, 'update'])->name('job.update');
+Route::delete('/job-opening/{id}', [JobOpeningController::class, 'destroy'])->name('job.destroy');
